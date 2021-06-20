@@ -2075,7 +2075,6 @@ h6 {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  filter: brightness(150%);
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
