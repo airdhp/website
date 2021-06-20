@@ -59,7 +59,7 @@
       let property_lng;
       let photos;
 
-      if (filterUrl[filterUrl.length - 1] === 'index.html') {
+      if (filterUrl[filterUrl.length - 1] === 'index.html' || filterUrl[filterUrl.length - 1] === "") {
         slug = filterUrl[filterUrl.length - 2]
       } else {
         slug = filterUrl[filterUrl.length - 1]
