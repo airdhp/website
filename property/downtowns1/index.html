@@ -199,6 +199,47 @@
       }
       fetchDataAPI();
 
+      function sendForm() {
+        const sendEmail = API_URL + "notification"
+        // fetch API
+        document.getElementById("contact-form-sending").style.display = "block";
+        document.getElementById("contact-form-sending").innerHTML = `<div class="contact-form-sending-msg"><div class="alert alert-info" role="alert">Sending..</div></div>`;
+        document.getElementById("btnSubmit").setAttribute("disabled","disabled");
+
+        const content = `<p><strong>Name</strong>: ${document.getElementById('name').value}</p><p><strong>Phone</strong>: ${document.getElementById('form_phone').value}</p><p><strong>Message</strong>:</p><p>${document.getElementById('message').value}</p>`
+        const form_email = document.getElementById('form_email').value
+
+        fetch(sendEmail, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(
+            {
+                'receiver': form_email,
+                'sender': 'AirDhp',
+                'subject': 'AirDhp Form: ' + slug,
+                'message': content,
+                'channel': 'email'
+            }
+          )
+          }).then(res => res.json())
+            .then((data) => {
+
+              if(data['result'] == 'success') {
+                // replace content of contact-form div
+                document.getElementById("contact-form-sending").innerHTML = `<div class="contact-form-sending-msg"><div class="alert alert-success" role="alert">Thank you for your message. We'll back to you soon!</div></div>`
+                document.getElementById("contact-form").style.display = 'none';
+              } else {
+                document.getElementById("contact-form-sending").innerHTML = `<div class="contact-form-sending-msg"><div class="alert alert-danger" role="alert">Ops! Something went wrong. Please check data in the form and try again.</div></div>`
+                document.getElementById("btnSubmit").disabled = false;
+              }
+
+          }).catch((error) => {
+            alert("Error in sending msg. Please try again.");
+            document.getElementById("contact-form-sending").style.display = "none";
+            document.getElementById("btnSubmit").removeAttribute("disabled");
+          });
+        }
+
       // Gallery for properties photo
       function openOnImageClick(photoId, srcImage) {
         document.getElementById(photoId).setAttribute('src', srcImage);
@@ -324,18 +365,18 @@
       <div class="container pt-60">
           <div class="row pb-0 pt-3">
               <div class="col-md-12 pl-0">
-                  <h2 id="title">Apartment in Marina, 2 beds</h2>
+                  <h2 id="title"></h2>
               </div>
           </div>
           <div class="row mb-10">
               <div class="col-md-4 pl-0">
                   <ul class="list-inline">
-                      <li class="list-inline-item"><i class="fas fa-map-marker-alt primary-color"></i> <span id="location">Dubai, Marina Residence</span></li>
+                      <li class="list-inline-item"><i class="fas fa-map-marker-alt primary-color"></i> <span id="location"></span></li>
                   </ul>
               </div>
               <div class="col-md-8 justify-self-end text-right pr-0">
                   <div class="content-middle">
-                      <p class="mb-0 d-inline-block"><i class="flaticon-town pr-1 primary-color"></i> Size: <span id="size">90</span>m2 / Max guests: <span id="max_guests">4</span> / Rooms: <span id="rooms">4</span> / Bath: <span id="baths">4</span></p>
+                      <p class="mb-0 d-inline-block"><i class="flaticon-town pr-1 primary-color"></i> Size: <span id="size"></span>m2 / Max guests: <span id="max_guests"></span> / Rooms: <span id="rooms"></span> / Bath: <span id="baths"></span></p>
                   </div>
               </div>
           </div>
@@ -357,24 +398,13 @@
                       </div>
                       <p id="summary"></p>
                       <p id="desc"></p>
-                      <a href="#" class="download primary-color"><i class="far fa-file-archive"></i> PDF Download</a>
                   </div>
                   <div class="single-item detail-feature mb-30">
                       <h4>Features</h4>
                       <div class="lists mb-30">
                           <ul class="detail-list" id="extras_list_1">
-                              <li><i class="fas fa-car-alt"></i> Parking</li>
-                              <li><i class="fas fa-bed"></i> Beds</li>
-                              <li><i class="fas fa-bath"></i> Bath</li>
-                              <li><i class="fas fa-map"></i> Plot Size</li>
-                              <li><i class="fas fa-door-open"></i> Rooms</li>
                           </ul>
                           <ul class="detail-list" id="extras_list_2">
-                              <li><i class="fas fa-home"></i> Built Year</li>
-                              <li><i class="fas fa-arrows-alt"></i> Sq ft</li>
-                              <li><i class="fas fa-tv"></i> Living Room</li>
-                              <li><i class="fas fa-venus-double"></i> Kitchens</li>
-                              <li><i class="fas fa-torii-gate"></i> Oriantation</li>
                           </ul>
                       </div>
                   </div>
@@ -412,13 +442,16 @@
                               </div>
                           </div>
                           <div class="contact">
-                              <form>
-                                  <input type="text" name="name" placeholder="Your Name*">
-                                  <input type="email" name="email" placeholder="Your Email*">
-                                  <input type="text" name="phone" placeholder="Your Phone number*">
-                                  <textarea name="message" placeholder="Your Message*"></textarea>
-                                  <button type="submit" class="d-block button button-primary">Send Message</button>
-                              </form>
+                            <form class="needs-validation" novalidate>
+                              <div id="contact-form-sending" style="display: none;"></div>
+                              <div class="contact-form" id="contact-form">
+                                <input type="text" name="name" id="name" class="form-control" placeholder="Your Name*" required>
+                                <input type="email" name="email" id="form_email" class="form-control" placeholder="Your Email*" required>
+                                <input type="text" name="phone" id="form_phone" class="form-control" placeholder="Your Phone number*" required>
+                                <textarea name="message" id="message" class="form-control" placeholder="Your Message*" required></textarea>
+                                <button type="submit" id="btnSubmit" class="d-block button button-primary">Send Message</button>
+                              </div>
+                            </form>
                           </div>
                       </div>
                   </div>
@@ -528,6 +561,29 @@
   <!-- <script src="../../js/slider.js"></script> -->
 
 
+  <script>
+  // Example starter JavaScript for disabling form submissions if there are invalid fields
+  (function() {
+    'use strict';
+    window.addEventListener('load', function() {
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.getElementsByClassName('needs-validation');
+      // Loop over them and prevent submission
+      var validation = Array.prototype.filter.call(forms, function(form) {
+        form.addEventListener('submit', function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (form.checkValidity() === true) {
+            sendForm();
+          }
+          form.classList.add('was-validated');
+
+        }, false);
+      });
+    }, false);
+  })();
+  </script>
 
 </body>
 
