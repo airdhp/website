@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="../img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../img/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../img/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="http://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bad+Script&display=swap" rel="stylesheet">
+
+    <!-- All Styles -->
+    <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../lib/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../lib/iconfont/flaticon.css">
+    <link rel="stylesheet" href="../lib/Menuzord/css/menuzord.css">
+    <!-- <link rel="stylesheet" href="lib/slick/slick.css">
+    <link rel="stylesheet" href="lib/slick/slick-theme.css"> -->
+    <!-- <link rel="stylesheet" href="lib/fancybox/jquery.fancybox.css"> -->
+    <link rel="stylesheet" href="../lib/animate/animate.css">
+    <!-- <link rel="stylesheet" href="lib/aos/aos.css"> -->
+
+    <!-- Theme Styels -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+
+    <title>AIR DHP - Dubai Holiday Properties - Luxury Living</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="real estate, Dubai, rent">
+    <meta name="keywords" content="real estate, Dubai, rent">
+
+    <script>
+
+      //page specific
+      let slug;
+      const currentURL = window.location.href
+      const filterUrl = currentURL.split("/");
+      let property_lat;
+      let property_lng;
+      let photos;
+
+      if (filterUrl[filterUrl.length - 1] === 'index.html') {
+        slug = filterUrl[filterUrl.length - 2]
+      } else {
+        slug = filterUrl[filterUrl.length - 1]
+      }
+      console.log("slug", slug);
+
+      const features = [];
+      let properties_html = ''
+      const API_URL = "https://airdhp-api.herokuapp.com/website/";
+      const getConfiguration = API_URL + "configuration";
+      const getProperties = API_URL + "properties";
+      const headers = {
+        'Content-Type': 'application/json',
+        'api-key': 'BEEJ5Y140F0DAGLIC41C',
+        'api-secret': '7SYXWXPJAYERY3T6L8EB'
+      }
+
+      async function fetchDataAPI() {
+        const [configurationResponse, propertiesResponse] = await Promise.all([
+          fetch(getConfiguration, { headers: headers }),
+          fetch(getProperties, { headers: headers })
+        ]);
+
+        const configuration = await configurationResponse.json();
+        const properties = await propertiesResponse.json();
+
+        // Render page
+        const website = configuration['website']['data']
+        document.getElementById("phone").innerHTML = website['phone']
+        document.getElementById("email").innerHTML = website['email']
+
+
+        //Properties menu
+        for (item of properties) {
+          document.getElementById("properties_list").innerHTML += `<li><a href="/property/${item['slug']}">${item['title']}</a></li>`
+        }
+
+      }
+      fetchDataAPI();
+
+
+      function sendForm() {
+        const sendEmail = API_URL + "notification"
+        // fetch API
+        document.getElementById("contact-form-sending").style.display = "block";
+        document.getElementById("contact-form-sending").innerHTML = `<div class="contact-form-sending-msg"><div class="alert alert-info" role="alert">Sending..</div></div>`;
+        document.getElementById("btnSubmit").setAttribute("disabled","disabled");
+
+        const content = `<p><strong>Name</strong>: ${document.getElementById('name').value}</p><p><strong>Phone</strong>: ${document.getElementById('form_phone').value}</p><p><strong>Message</strong>:</p><p>${document.getElementById('message').value}</p>`
+        const form_email = document.getElementById('form_email').value
+
+        fetch(sendEmail, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(
+            {
+                'receiver': form_email,
+                'sender': 'AirDhp',
+                'subject': 'AirDhp Form: ' + slug,
+                'message': content,
+                'channel': 'email'
+            }
+          )
+          }).then(res => res.json())
+            .then((data) => {
+
+              if(data['result'] == 'success') {
+                // replace content of contact-form div
+                document.getElementById("contact-form-sending").innerHTML = `<div class="contact-form-sending-msg"><div class="alert alert-success" role="alert">Thank you for your message. We'll back to you soon!</div></div>`
+                document.getElementById("contact-form").style.display = 'none';
+              } else {
+                document.getElementById("contact-form-sending").innerHTML = `<div class="contact-form-sending-msg"><div class="alert alert-danger" role="alert">Ops! Something went wrong. Please check the data entered in the form and try again.</div></div>`
+                document.getElementById("btnSubmit").disabled = false;
+              }
+
+          }).catch((error) => {
+            alert("Error in sending msg. Please try again.");
+            document.getElementById("contact-form-sending").style.display = "none";
+            document.getElementById("btnSubmit").removeAttribute("disabled");
+          });
+        }
+
+    </script>
+</head>
+
+<body>
+
+    <!-- Back to Top Button -->
+    <a id="top-button" href="#"><i class="fas fa-chevron-up"></i></a>
+    <!-- End of Back to Top -->
+
+    <!-- Preloader -->
+    <div class="preloader-layout">
+        <div class="logo-div text-center">
+          <img src="../img/logo.png" alt="Air Dhp" class="logo-img">
+        </div>
+        <div class="cube-wrapper">
+        </div>
+    </div>
+
+    <!--
+    ========================================
+        Header Section
+    ========================================
+    -->
+    <header id="header" class="header-layout-one unveiled-navigation">
+        <!-- Header Top -->
+        <div class="top-bar" id="topbar">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-9 align-self-center">
+                        <div class="bar-left">
+                            <ul class="list-inline">
+                                <li class="list-inline-item color-white mr-4"><i class="fas fa-phone-alt mr-1"></i> <span id="phone">+9715000000</span></li>
+                                <li class="list-inline-item color-white"><i class="far fa-envelope-open mr-1"></i> <span id="email">airghp@gmail.com</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-right">
+                        <ul class="list-inline top-social">
+                            <li class="list-inline-item">
+                                <a href="https://www.facebook.com/pages/category/Property-Management-Company/Airdhp-Luxury-Living-107786301418587/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="https://www.instagram.com/airdhp_luxury_living_/" target="_blank"><i class="fab fa-instagram"></i></a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#"><i class="fab fa-youtube"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="header-bottom">
+            <div class="container">
+                <div class="menuzord main-navigation" id="menuzord">
+                    <a href="/" class="menuzord-brand"><img src="../img/logo.png" alt="" style="height: 60px" data-rjs="3"></a>
+                    <span class="page_title">For Landlords</span>
+                      <ul class="menuzord-menu menuzord-right">
+                        <li><a href="/">Home</a></li>
+                        <li class="active"><a href="#">Properties</a>
+                            <ul class="dropdown" id="properties_list">
+                            </ul>
+                        </li>
+                        <li><a href="/for_landlords">For Landlords</a></li>
+                        <li><a href="/interior_design">Interior design</a></li>
+                        <li><a href="/contact_us">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!--
+    ========================================
+        Hero Section
+    ========================================
+    -->
+    <section id="hero" class="innar-hero">
+        <div class="container pa-80">
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- <h3 class="mb-0">For Landlords</h3> -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--
+    ========================================
+        Single Service Sections
+    ========================================
+    -->
+    <section class="single-service-layout">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 pt-3" style="border-top: 1px solid #EEE">
+                    <div class="service-content">
+                        <h2 class="pt-0">Properties management</h2>
+                        <p>We’ve worked hard to create an environment designed to ensure intelligent professionals thrive. Through a rigorous selection process and by making JFM a great place to work, we attract only the most capable people. This is demonstrated by the way service is delivered to our customers.</p>
+                        <p>Fundamental standards are in place to ensure your critical risks are managed, from strong financial reporting through to a regimented inspection process and tight health and safety management. Regular portfolio reviews and strong internal tracking systems allow us to periodically arrange a ‘health check’ for your development.</p>
+                        <ul class="list-service">
+                            <li>Intelligent Approach</li>
+                            <li>Quick Response</li>
+                            <li>Friendly Team</li>
+                            <li>Tailored Solutions</li>
+                        </ul>
+
+                        <div class="service-row row mb-50 mt-4 pt-2">
+                            <div class="col-md-6">
+                                <img src="https://res.cloudinary.com/dahst9fvr/image/upload/v1624046121/images/assets/header1_mncliv.jpg" alt="" class="img-fluid">
+                            </div>
+                            <div class="col-md-6 align-self-center">
+                                <h4>Reasons to work with us</h4>
+                                <ul class="list-service">
+                                    <li>Dedicated Property Manager</li>
+                                    <li>Excellent Response Times</li>
+                                    <li>Online Portal Area</li>
+                                    <li>Repairs & Maintenance </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="property-sidebar">
+                      <div class="sidebar-item item-one mb-30">
+                          <div class="sidebar-author">
+                              <img src="https://res.cloudinary.com/dahst9fvr/image/upload/v1624103524/images/assets/contactus_hqouya.png" alt="Contact Us" class="img-fluid" style="filter: brightness(120%)">
+                              <div class="hover">
+                                  <div class="author d-flex">
+                                      <div class="img">
+                                          <img src="https://res.cloudinary.com/dahst9fvr/image/upload/v1624211848/images/assets/ania_xv148m.png" alt="Ann">
+                                      </div>
+                                      <h6 class="mb-0 ml-2 px-1 align-self-center color-white bg-dark">Ann Wisniewska-Soja</h6>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="contact">
+                            <form class="needs-validation" novalidate>
+                              <div id="contact-form-sending" style="display: none;"></div>
+                              <div class="contact-form" id="contact-form">
+                                <input type="text" name="name" id="name" class="form-control" placeholder="Your Name*" required>
+                                <input type="email" name="email" id="form_email" class="form-control" placeholder="Your Email*" required>
+                                <input type="text" name="phone" id="form_phone" class="form-control" placeholder="Your Phone number*" required>
+                                <textarea name="message" id="message" class="form-control" placeholder="Your Message*" required></textarea>
+                                <button type="submit" id="btnSubmit" class="d-block button button-primary">Send Message</button>
+                              </div>
+                            </form>
+                          </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!--
+    ========================================
+        Footer Section
+    ========================================
+    -->
+    <footer id="footer" class="footer-layout-one">
+        <div class="footer-top" style="display: none;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="footer-widget">
+                            <h4>Properties</h4>
+                            <ul class="list-footer">
+                                <li><a href="#">Commercial</a></li>
+                                <li><a href="#">House</a></li>
+                                <li><a href="#">Office</a></li>
+                                <li><a href="#">Residential</a></li>
+                                <li><a href="#">Residential Tower</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="footer-widget">
+                            <h4>About Us</h4>
+                            <div class="lists">
+                                <ul class="list-footer">
+                                    <li><a href="#">Home</a></li>
+                                    <li><a href="#">Services</a></li>
+                                    <li><a href="#">Pricing</a></li>
+                                    <li><a href="#">Blog</a></li>
+                                    <li><a href="#">Features</a></li>
+                                </ul>
+
+                                <ul class="list-footer">
+                                    <li><a href="#">About Us</a></li>
+                                    <li><a href="#">Conditions</a></li>
+                                    <li><a href="#">User's Guide</a></li>
+                                    <li><a href="#">Support Center</a></li>
+                                    <li><a href="#">Press Info</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="footer-widget">
+                            <h4>Location</h4>
+                            <div class="map-image">
+                                <div id="map-footer" style="height: 210px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-0">&copy; 2021 AIR GHP</p>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <ul class="list-inline">
+                            <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
+                            <li class="list-inline-item"><a href="#">Terms and Conditions</a></li>
+                            <li class="list-inline-item"><a href="#">Contact Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="muted icons_from">Icons from <a href="https://www.flaticon.com/" title="Flaticon" style="color: #999">www.flaticon.com</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../lib/jquery-3.4.1.min.js"></script>
+    <script src="../lib/jquery-ui.min.js"></script>
+    <script src="../lib/bootstrap/js/popper.min.js"></script>
+    <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../lib/counterup/waypoints.min.js"></script>
+    <script src="../lib/counterup/jquery.counterup.min.js"></script>
+    <script src="../lib/fancybox/jquery.fancybox.min.js"></script>
+    <script src="../lib/Menuzord/js/menuzord.js"></script>
+    <script src="../lib/isotope/isotope.min.js"></script>
+    <script src="../lib/aos/aos.js"></script>
+    <script src="../lib/retina/retina.min.js"></script>
+    <!-- <script src="../lib/slick/slick.min.js"></script> -->
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFxhUVMwiYKz3ii7f3PL1_YYih3fOtg-M"></script>
+    <!-- <script src="../lib/maps/short-map.js"></script>
+    <script src="../lib/maps/footer-map.js"></script> -->
+
+    <!-- Custom Scripts -->
+    <script src="../js/behome.js"></script>
+    <!-- <script src="../js/slider.js"></script> -->
+
+    <script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function() {
+      'use strict';
+      window.addEventListener('load', function() {
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.getElementsByClassName('needs-validation');
+        // Loop over them and prevent submission
+        var validation = Array.prototype.filter.call(forms, function(form) {
+          form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (form.checkValidity() === true) {
+              sendForm();
+            }
+            form.classList.add('was-validated');
+
+          }, false);
+        });
+      }, false);
+    })();
+    </script>
+
+</body>
+</html>

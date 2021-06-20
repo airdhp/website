@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../../img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../../img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../../img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../../img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../../img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../../img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../../img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../../img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="../../img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../../img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../../img/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../../img/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="http://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bad+Script&display=swap" rel="stylesheet">
+
+    <!-- All Styles -->
+    <link rel="stylesheet" href="../../lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../lib/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../../lib/iconfont/flaticon.css">
+    <link rel="stylesheet" href="../../lib/Menuzord/css/menuzord.css">
+    <!-- <link rel="stylesheet" href="lib/slick/slick.css">
+    <link rel="stylesheet" href="lib/slick/slick-theme.css"> -->
+    <!-- <link rel="stylesheet" href="lib/fancybox/jquery.fancybox.css"> -->
+    <link rel="stylesheet" href="../../lib/animate/animate.css">
+    <!-- <link rel="stylesheet" href="lib/aos/aos.css"> -->
+
+    <!-- Theme Styels -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+
+    <title>AIR DHP - Dubai Holiday Properties - Luxury Living</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="real estate, Dubai, rent">
+    <meta name="keywords" content="real estate, Dubai, rent">
+
+    <script>
+
+      //page specific
+      let slug;
+      const currentURL = window.location.href
+      const filterUrl = currentURL.split("/");
+      let property_lat;
+      let property_lng;
+      let photos;
+
+      if (filterUrl[filterUrl.length - 1] === 'index.html') {
+        slug = filterUrl[filterUrl.length - 2]
+      } else {
+        slug = filterUrl[filterUrl.length - 1]
+      }
+      console.log("slug", slug);
+
+      const features = [];
+      let properties_html = ''
+      const API_URL = "https://airdhp-api.herokuapp.com/website/";
+      const getConfiguration = API_URL + "configuration";
+      const getProperty = API_URL + "property/" + slug;
+      const getProperties = API_URL + "properties";
+      const headers = {
+        'api-key': 'BEEJ5Y140F0DAGLIC41C',
+        'api-secret': '7SYXWXPJAYERY3T6L8EB'
+      }
+
+      async function fetchDataAPI() {
+        const [configurationResponse, propertyResponse, propertiesResponse] = await Promise.all([
+          fetch(getConfiguration, { headers: headers }),
+          fetch(getProperty, { headers: headers }),
+          fetch(getProperties, { headers: headers })
+        ]);
+
+        const configuration = await configurationResponse.json();
+        const property = await propertyResponse.json();
+        const properties = await propertiesResponse.json();
+
+        console.log('configuration', configuration);
+        console.log('property', property);
+
+        // Render page
+        const website = configuration['website']['data']
+        document.getElementById("phone").innerHTML = website['phone']
+        document.getElementById("email").innerHTML = website['email']
+
+        //Render page - specific
+        document.getElementById("title").innerHTML = property['title']
+        document.getElementById("location").innerHTML = property['location']['name']
+        document.getElementById("summary").innerHTML = property['summary']
+        document.getElementById("desc").innerHTML = property['desc']
+
+        for (let attr of property['attributes']) {
+          if (attr['type'] == "rooms") {
+            document.getElementById("rooms").innerHTML = attr['value']
+          }
+
+          if (attr['type'] == "max_guests") {
+            document.getElementById("max_guests").innerHTML = attr['value']
+          }
+
+          if (attr['type'] == "bathrooms") {
+            document.getElementById("baths").innerHTML = attr['value']
+          }
+
+          if (attr['type'] == "size") {
+            document.getElementById("size").innerHTML = attr['value']
+          }
+        }
+
+        let i=0
+        let ec;
+        let extras1 = "";
+        let extras2 = "";
+        for (e of property['extras']) {
+          if(e['value'] == true) {
+            console.log("type", e['type'])
+            ec = configuration['properties']['extras'].find(o => o.extrasName === e['type']);
+            if (ec) {
+              i++;
+              console.log("i", i)
+              name = ec['extrasName'].replace("_", ' ');
+              if(i % 2 == 0) {
+                extras2 += `<li class="extras"><i class="${ec['extrasIconUrl']}"></i> ${ec['extrasName']}</li>`
+              } else {
+                extras1 += `<li class="extras"><i class="${ec['extrasIconUrl']}"></i> ${ec['extrasName']}</li>`
+              }
+            }
+          }
+        }
+        document.getElementById("extras_list_1").innerHTML = extras1
+        document.getElementById("extras_list_2").innerHTML = extras2
+
+
+        // Prepare markers for google maps
+        property_lat = property['location']['lat'];
+        property_lng = property['location']['lng'];
+        features.push(
+          {
+            position: { lat: property_lat, lng: property_lng },
+            title: property['title'],
+            url: "#"
+          }
+        )
+
+        //Properties menu
+        for (item of properties) {
+          document.getElementById("properties_list").innerHTML += `<li><a href="/property/${item['slug']}">${item['title']}</a></li>`
+        }
+
+        //Photos
+        if (property['photos'].length > 0) {
+
+          photos = `
+            <div class="property-carousel property-slide-one">
+                <div class="property-slide">
+                    <img id="photo_${item['_id']}" src="${item['photos'][0]['imageUrl']['secure_url']}" alt="" class="photo_reg_property img-fluid"">
+                </div>
+            </div>
+            <div class="photo_list">
+          `
+
+          for (let p of item['photos']) {
+
+            photos += `
+                <img class="photo_thumb_property" src="${p['imageUrl']['secure_url']}" alt="" onclick="openOnImageClick('photo_${item['_id']}', '${p['imageUrl']['secure_url']}')">
+            `
+          }
+          photos += `</div>`
+
+        } else {
+
+          let no_photo = configuration['website']['assets'].find(o => o.img === 'no_photo')['url'];
+
+          photos = `
+            <div class="property-carousel property-slide-one">
+                <div class="property-slide">
+                    <img src="${no_photo}" alt="" class="photo_reg_property img-fluid" style="border: 3px solid #EEE">
+                </div>
+            </div>
+          `
+        }
+        document.getElementById("photos").innerHTML = photos;
+
+
+
+      }
+      fetchDataAPI();
+
+      // Gallery for properties photo
+      function openOnImageClick(photoId, srcImage) {
+        document.getElementById(photoId).setAttribute('src', srcImage);
+      }
+
+    </script>
+
+    <script>
+      // Initialize and add the map
+      function initMap() {
+          if (features.length > 0) {
+          console.log("checking", features);
+          clearInterval(checkMarkers);
+            // The map
+            const map = new google.maps.Map(document.getElementById("map"), {
+              zoom: 14,
+              center: {lat: property_lat, lng: property_lng },
+              mapId: 'f79fae2847856346'
+            });
+
+            var markerIcon = {
+              url: 'https://image.flaticon.com/icons/png/64/727/727590.png',
+              scaledSize: new google.maps.Size(40, 40)
+            };
+
+            // Create markers.
+            for (let i = 0; i < features.length; i++) {
+              let markers = new google.maps.Marker({
+                position: features[i].position,
+                animation: google.maps.Animation.DROP,
+                map: map,
+                url: features[i].url,
+                icon: markerIcon,
+                title: features[i].title
+              });
+
+              google.maps.event.addListener(markers, "click", function() {
+                window.location.href = this.url;
+              });
+            }
+        }
+      }
+      let checkMarkers = setInterval(initMap, 500);
+    </script>
+</head>
+<body>
+
+  <!-- Back to Top Button -->
+  <a id="top-button" href="#"><i class="fas fa-chevron-up"></i></a>
+  <!-- End of Back to Top -->
+
+  <!-- Preloader -->
+  <div class="preloader-layout">
+      <div class="logo-div text-center">
+        <img src="../../img/logo.png" alt="Air Dhp" class="logo-img">
+      </div>
+      <div class="cube-wrapper">
+      </div>
+  </div>
+
+  <!--
+  ========================================
+      Header Section
+  ========================================
+  -->
+  <header id="header" class="header-layout-one unveiled-navigation">
+      <!-- Header Top -->
+      <div class="top-bar" id="topbar">
+          <div class="container">
+              <div class="row">
+                  <div class="col-md-9 align-self-center">
+                      <div class="bar-left">
+                          <ul class="list-inline">
+                              <li class="list-inline-item color-white mr-4"><i class="fas fa-phone-alt mr-1"></i> <span id="phone">+9715000000</span></li>
+                              <li class="list-inline-item color-white"><i class="far fa-envelope-open mr-1"></i> <span id="email">airghp@gmail.com</span></li>
+                          </ul>
+                      </div>
+                  </div>
+                  <div class="col-md-3 text-right">
+                      <ul class="list-inline top-social">
+                          <li class="list-inline-item">
+                              <a href="https://www.facebook.com/pages/category/Property-Management-Company/Airdhp-Luxury-Living-107786301418587/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                          </li>
+                          <li class="list-inline-item">
+                              <a href="https://www.instagram.com/airdhp_luxury_living_/" target="_blank"><i class="fab fa-instagram"></i></a>
+                          </li>
+                          <li class="list-inline-item">
+                              <a href="#"><i class="fab fa-youtube"></i></a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <div id="header-bottom">
+          <div class="container">
+              <div class="menuzord main-navigation" id="menuzord">
+                  <a href="/" class="menuzord-brand"><img src="../../img/logo.png" alt="" style="height: 60px" data-rjs="3"></a>
+                  <span class="page_title">Properties</span>
+                    <ul class="menuzord-menu menuzord-right">
+                      <li><a href="/">Home</a></li>
+                      <li class="active"><a href="#">Properties</a>
+                          <ul class="dropdown" id="properties_list">
+                          </ul>
+                      </li>
+                      <li><a href="/for_landlords">For Landlords</a></li>
+                      <li><a href="/interior_design">Interior design</a></li>
+                      <li><a href="/contact_us">Contact Us</a></li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </header>
+
+
+  <!--
+  ========================================
+      Content Section
+  ========================================
+  -->
+  <div class="property-header-content pt-86 mb-30">
+      <div class="container pt-60">
+          <div class="row pb-0 pt-3">
+              <div class="col-md-12 pl-0">
+                  <h2 id="title">Apartment in Marina, 2 beds</h2>
+              </div>
+          </div>
+          <div class="row mb-10">
+              <div class="col-md-4 pl-0">
+                  <ul class="list-inline">
+                      <li class="list-inline-item"><i class="fas fa-map-marker-alt primary-color"></i> <span id="location">Dubai, Marina Residence</span></li>
+                  </ul>
+              </div>
+              <div class="col-md-8 justify-self-end text-right pr-0">
+                  <div class="content-middle">
+                      <p class="mb-0 d-inline-block"><i class="flaticon-town pr-1 primary-color"></i> Size: <span id="size">90</span>m2 / Max guests: <span id="max_guests">4</span> / Rooms: <span id="rooms">4</span> / Bath: <span id="baths">4</span></p>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div class="mb-20">
+      <div id="photos">
+      </div>
+  </div>
+
+  <div class="property-main-content pb-100">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-8">
+                  <div class="single-item mb-30 intro-content">
+                      <div class="heading">
+                          <h4>Property Description</h4>
+                      </div>
+                      <p id="summary"></p>
+                      <p id="desc"></p>
+                      <a href="#" class="download primary-color"><i class="far fa-file-archive"></i> PDF Download</a>
+                  </div>
+                  <div class="single-item detail-feature mb-30">
+                      <h4>Features</h4>
+                      <div class="lists mb-30">
+                          <ul class="detail-list" id="extras_list_1">
+                              <li><i class="fas fa-car-alt"></i> Parking</li>
+                              <li><i class="fas fa-bed"></i> Beds</li>
+                              <li><i class="fas fa-bath"></i> Bath</li>
+                              <li><i class="fas fa-map"></i> Plot Size</li>
+                              <li><i class="fas fa-door-open"></i> Rooms</li>
+                          </ul>
+                          <ul class="detail-list" id="extras_list_2">
+                              <li><i class="fas fa-home"></i> Built Year</li>
+                              <li><i class="fas fa-arrows-alt"></i> Sq ft</li>
+                              <li><i class="fas fa-tv"></i> Living Room</li>
+                              <li><i class="fas fa-venus-double"></i> Kitchens</li>
+                              <li><i class="fas fa-torii-gate"></i> Oriantation</li>
+                          </ul>
+                      </div>
+                  </div>
+
+                  <!-- Video -->
+                  <!-- <div class="single-item detail-video mb-30">
+                      <h4>Propertis Video</h4>
+                      <div class="video-item">
+                          <img src="https://via.placeholder.com/710x375/ededed/999/" alt="Behome" class="img-fluid">
+                          <a data-fancybox="YouTube" href="https://www.youtube.com/watch?v=Maz7qkLzwYw" class="youtube-icon"><i class="fab fa-youtube"></i></a>
+                      </div>
+                  </div> -->
+
+
+
+                  <div class="single-item mb-30">
+                      <h4 class="pb-2">Map</h4>
+                      <div id="map" class="map-canvas" id="map-canvas" style="width: 100%; height: 350px;"></div>
+                  </div>
+
+
+              </div>
+              <div class="col-md-4">
+                  <div class="property-sidebar">
+                      <div class="sidebar-item item-one mb-30">
+                          <div class="sidebar-author">
+                              <img src="https://res.cloudinary.com/dahst9fvr/image/upload/v1624103524/images/assets/contactus_hqouya.png" alt="Contact Us" class="img-fluid" style="filter: brightness(120%)">
+                              <div class="hover">
+                                  <div class="author d-flex">
+                                      <div class="img">
+                                          <img src="https://res.cloudinary.com/dahst9fvr/image/upload/v1624103291/images/assets/ania_q1pwzq.png" alt="Ann">
+                                      </div>
+                                      <h6 class="mb-0 ml-2 px-1 align-self-center color-white bg-dark">Ann Wisniewska-Soja</h6>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="contact">
+                              <form>
+                                  <input type="text" name="name" placeholder="Your Name*">
+                                  <input type="email" name="email" placeholder="Your Email*">
+                                  <input type="text" name="phone" placeholder="Your Phone number*">
+                                  <textarea name="message" placeholder="Your Message*"></textarea>
+                                  <button type="submit" class="d-block button button-primary">Send Message</button>
+                              </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
+  <!--
+  ========================================
+      Footer Section
+  ========================================
+  -->
+  <footer id="footer" class="footer-layout-one">
+      <div class="footer-top" style="display: none;">
+          <div class="container">
+              <div class="row">
+                  <div class="col-md-3">
+                      <div class="footer-widget">
+                          <h4>Properties</h4>
+                          <ul class="list-footer">
+                              <li><a href="#">Commercial</a></li>
+                              <li><a href="#">House</a></li>
+                              <li><a href="#">Office</a></li>
+                              <li><a href="#">Residential</a></li>
+                              <li><a href="#">Residential Tower</a></li>
+                          </ul>
+                      </div>
+                  </div>
+                  <div class="col-md-4">
+                      <div class="footer-widget">
+                          <h4>About Us</h4>
+                          <div class="lists">
+                              <ul class="list-footer">
+                                  <li><a href="#">Home</a></li>
+                                  <li><a href="#">Services</a></li>
+                                  <li><a href="#">Pricing</a></li>
+                                  <li><a href="#">Blog</a></li>
+                                  <li><a href="#">Features</a></li>
+                              </ul>
+
+                              <ul class="list-footer">
+                                  <li><a href="#">About Us</a></li>
+                                  <li><a href="#">Conditions</a></li>
+                                  <li><a href="#">User's Guide</a></li>
+                                  <li><a href="#">Support Center</a></li>
+                                  <li><a href="#">Press Info</a></li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-5">
+                      <div class="footer-widget">
+                          <h4>Location</h4>
+                          <div class="map-image">
+                              <div id="map-footer" style="height: 210px;"></div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="footer-bottom">
+          <div class="container">
+              <div class="row">
+                  <div class="col-md-6">
+                      <p class="mb-0">&copy; 2021 AIR GHP</p>
+                  </div>
+                  <div class="col-md-6 text-right">
+                      <ul class="list-inline">
+                          <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
+                          <li class="list-inline-item"><a href="#">Terms and Conditions</a></li>
+                          <li class="list-inline-item"><a href="#">Contact Us</a></li>
+                      </ul>
+                  </div>
+              </div>
+              <div class="muted icons_from">Icons from <a href="https://www.flaticon.com/" title="Flaticon" style="color: #999">www.flaticon.com</a></div>
+          </div>
+      </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../../lib/jquery-3.4.1.min.js"></script>
+  <script src="../../lib/jquery-ui.min.js"></script>
+  <!-- <script src="../../lib/bootstrap/js/popper.min.js"></script> -->
+  <script src="../../lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../../lib/counterup/waypoints.min.js"></script>
+  <script src="../../lib/counterup/jquery.counterup.min.js"></script>
+  <script src="../../lib/fancybox/jquery.fancybox.min.js"></script>
+  <script src="../../lib/Menuzord/js/menuzord.js"></script>
+  <script src="../../lib/isotope/isotope.min.js"></script>
+  <script src="../../lib/aos/aos.js"></script>
+  <script src="../../lib/retina/retina.min.js"></script>
+  <!-- <script src="../../lib/slick/slick.min.js"></script> -->
+
+  <!-- <script src="../../lib/maps/footer-map.js"></script> -->
+  <!-- <script src="../../lib/maps/short-map.js"></script> -->
+
+  <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+  <script async
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBelgnUtz1Pi675RFeU8_6EqhmdmOC2DN8&callback=initMap">
+  </script>
+
+  <!-- Custom Scripts -->
+  <script src="../../js/behome.js"></script>
+  <!-- <script src="../../js/slider.js"></script> -->
+
+
+
+</body>
+
+</html>
