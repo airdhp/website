@@ -5816,7 +5816,7 @@ background: linear-gradient(
   }
 
   .quote {
-    font-family: 'Bad Script', cursive;
+    /* font-family: 'Bad Script', cursive; */
     font-size: 20px;
     color: #DDD;
   }
