@@ -155,6 +155,7 @@
         )
 
         //Properties menu
+        console.log('NEW properties', properties);
         for (item of properties) {
           document.getElementById("properties_list").innerHTML += `<li><a href="/property/${item['slug']}">${item['title']}</a></li>`
         }
@@ -171,10 +172,10 @@
             <div class="photo_list">
           `
 
-          for (let p of item['photos']) {
+          for (let p of property['photos']) {
 
             photos += `
-                <img class="photo_thumb_property" src="${p['imageUrl']['secure_url']}" alt="" onclick="openOnImageClick('photo_${item['_id']}', '${p['imageUrl']['secure_url']}')">
+                <img class="photo_thumb_property" src="${p['imageUrl']['secure_url']}" alt="" onclick="openOnImageClick('photo_${property['_id']}', '${p['imageUrl']['secure_url']}')">
             `
           }
           photos += `</div>`
@@ -528,13 +529,13 @@
           <div class="container">
               <div class="row">
                   <div class="col-md-6">
-                      <p class="mb-0">&copy; 2021 AIR GHP</p>
+                      <p class="mb-0">&copy; 2021 AIR DHP</p>
                   </div>
                   <div class="col-md-6 text-right">
                       <ul class="list-inline">
                           <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
                           <li class="list-inline-item"><a href="#">Terms and Conditions</a></li>
-                          <li class="list-inline-item"><a href="#">Contact Us</a></li>
+                          <li class="list-inline-item"><a href="/contact_us">Contact Us</a></li>
                       </ul>
                   </div>
               </div>
