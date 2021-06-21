@@ -64,7 +64,6 @@
       } else {
         slug = filterUrl[filterUrl.length - 1]
       }
-      console.log("slug", slug);
 
       const features = [];
       let properties_html = ''
@@ -194,7 +193,7 @@
         }
         document.getElementById("photos").innerHTML = photos;
 
-
+        closeLoader();
 
       }
       fetchDataAPI();
@@ -244,6 +243,12 @@
       function openOnImageClick(photoId, srcImage) {
         document.getElementById(photoId).setAttribute('src', srcImage);
       }
+
+      function closeLoader() {
+        document.getElementById("data-loader").style.display = "none";
+      }
+      setTimeout(function() { closeLoader(); }, 5000);
+
 
     </script>
 
@@ -298,6 +303,10 @@
       </div>
       <div class="cube-wrapper">
       </div>
+  </div>
+  <div id="data-loader" class="data-loader">
+    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+    <div class="info">Loading data...</div>
   </div>
 
   <!--
@@ -529,7 +538,7 @@
                       </ul>
                   </div>
               </div>
-              <div class="muted icons_from">Icons from <a href="https://www.flaticon.com/" title="Flaticon" style="color: #999">www.flaticon.com</a></div>
+              <div id="custom_icons" class="muted icons_from">Icons from <a href="https://www.flaticon.com/" title="Flaticon" style="color: #999">www.flaticon.com</a></div>
           </div>
       </div>
   </footer>
@@ -584,6 +593,7 @@
     }, false);
   })();
   </script>
+
 
 </body>
 

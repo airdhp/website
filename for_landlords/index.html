@@ -97,8 +97,15 @@
           document.getElementById("properties_list").innerHTML += `<li><a href="/property/${item['slug']}">${item['title']}</a></li>`
         }
 
+        closeLoader();
       }
       fetchDataAPI();
+
+
+      function closeLoader() {
+        document.getElementById("data-loader").style.display = "none";
+      }
+      setTimeout(function() { closeLoader(); }, 5000);
 
 
       function sendForm() {
@@ -158,6 +165,10 @@
         </div>
         <div class="cube-wrapper">
         </div>
+    </div>
+    <div id="data-loader" class="data-loader">
+      <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+      <div class="info">Loading data...</div>
     </div>
 
     <!--
@@ -368,7 +379,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="muted icons_from">Icons from <a href="https://www.flaticon.com/" title="Flaticon" style="color: #999">www.flaticon.com</a></div>
+                <div id="custom_icons" class="muted icons_from">Icons from <a href="https://www.flaticon.com/" title="Flaticon" style="color: #999">www.flaticon.com</a></div>
             </div>
         </div>
     </footer>

@@ -35,7 +35,7 @@
                 e.preventDefault();
             });
 		}
-		
+
 		// Sidebar
         if ($('.sidenav').length) {
             var openclick = $('.off-canvas-btn');
@@ -82,7 +82,7 @@
                 e.stopPropagation();
             });
 		}
-		
+
 		// Active Item on Hover
 		if ($(".hover-active").length > 0) {
             $(".hover-active").on("mouseenter mouseleave", function (event) {
@@ -303,7 +303,7 @@
 				" - $" + $("#slider-range").slider("values", 1));
 		});
 
-		// Case Filter 
+		// Case Filter
 		if ($('.portfolio-items').length) {
 			var $grid = $('.portfolio-items').isotope({
 				itemSelector: '.mix',
@@ -341,7 +341,7 @@
 						borderWidth: 1,
 						data: ['10', '12', '13', '25', '00', '30', '10'],
 						fill: false,
-						
+
 					}]
 				},
 				options: {
@@ -371,7 +371,7 @@
 					}
 				}
 			};
-	
+
 			window.onload = function() {
 				var ctx = document.getElementById('skill-canvas').getContext('2d');
 				window.myLine = new Chart(ctx, config);
@@ -405,10 +405,11 @@
 	});
 
 	if ($('.preloader-layout').length) {
-        $(window).on('load', function () { // makes sure the whole site is loaded 
+        $(window).on('load', function () { // makes sure the whole site is loaded
             $('.cube-wrapper').fadeOut('slow');
-            $('.preloader-layout').delay(400).fadeOut('slow');
+            $('.preloader-layout').delay(500).fadeOut('slow');
         });
-    }
+  }
+
 
 })()

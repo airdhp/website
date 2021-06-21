@@ -361,7 +361,7 @@
             showReviews();
           }, 7000);
 
-
+          setTimeout(function() { closeLoader(); }, 1000);
         }
 
 
@@ -371,6 +371,11 @@
         function openOnImageClick(photoId, srcImage) {
           document.getElementById(photoId).setAttribute('src', srcImage);
         }
+
+        function closeLoader() {
+          document.getElementById("data-loader").style.display = "none";
+        }
+        setTimeout(function() { closeLoader(); }, 5000);
 
     </script>
 
@@ -427,6 +432,10 @@
         </div>
         <div class="cube-wrapper">
         </div>
+    </div>
+    <div id="data-loader" class="data-loader">
+      <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+      <div class="info">Loading data...</div>
     </div>
 
     <!--
@@ -541,7 +550,7 @@
         Property Section
     ========================================
     -->
-    <section id="property" class="property-layout-one py-5"></section>
+    <section id="property" class="property-layout-one pt-5"></section>
 
 
 
@@ -552,7 +561,7 @@
     -->
     <section id="feature-three" class="feature-layout-three py-5">
         <div class="container">
-            <div class="section-head mb-60">
+            <div class="section-head-services mb-60">
                 <h2 data-title="AIR DHP">Our services</h2>
                 <p class="mb-0">Learn about other services we provide</p>
             </div>
@@ -606,7 +615,7 @@
                       <div class="testimonial-item">
                         <div class="row">
                           <div class="col-md-12 pt-5 pb-5">
-                            <div class="section-head">
+                            <div class="section-head-testimonial">
                                 <h2 data-title="AIR DHP">What Our Clients Say</h2>
                             </div>
                             <i class="fas fa-quote-right text-white mb-3"></i>
@@ -692,7 +701,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="muted icons_from">Icons from <a href="https://www.flaticon.com/" title="Flaticon" style="color: #999">www.flaticon.com</a></div>
+                <div id="custom_icons" class="muted icons_from">Icons from <a href="https://www.flaticon.com/" title="Flaticon" style="color: #999">www.flaticon.com</a></div>
             </div>
         </div>
     </footer>
