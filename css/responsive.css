@@ -959,7 +959,7 @@
   .page_title {
     padding-left: 4px;
     font-size: 20px;
-    position: absolute;
+    /* position: absolute; */
     top: 18px;
   }
 

@@ -193,7 +193,7 @@
         }
         document.getElementById("photos").innerHTML = photos;
 
-        closeLoader();
+        setTimeout(function() { closeLoader(); }, 1000);
 
       }
       fetchDataAPI();
