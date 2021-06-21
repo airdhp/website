@@ -155,7 +155,6 @@
         )
 
         //Properties menu
-        console.log('NEW properties', properties);
         for (item of properties) {
           document.getElementById("properties_list").innerHTML += `<li><a href="/property/${item['slug']}">${item['title']}</a></li>`
         }
@@ -193,6 +192,28 @@
           `
         }
         document.getElementById("photos").innerHTML = photos;
+
+
+        let links = "";
+        let partnerName;
+        let partnerLogo;
+
+        if (property['links'].length > 0) {
+          links += "<h6>Check out and book us on</h6>";
+          for (let l of property['links']) {
+            let partner = configuration['partners'].find(o => o.partnerCode === l['partnerCode']);
+            partnerName = partner['partnerName']
+            partnerLogoUrl = partner['partnerLogo']
+
+            links += `
+            <a href="${l['url']}" class="partners-img mr-2" target="_blank">
+              <img src="${partnerLogoUrl}" alt="${partnerName}" />
+            </a>
+            `
+          }
+        }
+
+        document.getElementById("links").innerHTML = links;
 
         setTimeout(function() { closeLoader(); }, 1000);
 
@@ -408,6 +429,7 @@
                       </div>
                       <p id="summary"></p>
                       <p id="desc"></p>
+                      <p id="links"></p>
                   </div>
                   <div class="single-item detail-feature mb-30">
                       <h4>Features</h4>
