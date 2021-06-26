@@ -427,6 +427,10 @@ background: linear-gradient(
   }
 }
 
+.menuzord-menu ul.dropdown li.active a {
+  color: #333;
+}
+
 
 
 #top-button i {
