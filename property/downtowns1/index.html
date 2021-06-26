@@ -156,7 +156,11 @@
 
         //Properties menu
         for (item of properties) {
-          document.getElementById("properties_list").innerHTML += `<li><a href="/property/${item['slug']}">${item['title']}</a></li>`
+          if (${item['slug'] === slug) {
+           document.getElementById("properties_list").innerHTML += `<li class="active"><a href="/property/${item['slug']}">${item['title']}</a></li>`
+         } else {
+           document.getElementById("properties_list").innerHTML += `<li><a href="/property/${item['slug']}">${item['title']}</a></li>`
+         }
         }
 
         //Photos

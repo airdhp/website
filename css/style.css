@@ -870,7 +870,7 @@ background: linear-gradient(
     color: #808080; }
   .header-layout-one #header-bottom-two .menuzord-menu > li.active > a {
     color: #545454;
-    font-weight: 600;
+    font-weight: 500;
   }
   .header-layout-one #header-bottom-two .menuzord-menu.menuzord-right {
     float: none;
